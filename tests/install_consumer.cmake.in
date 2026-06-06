@@ -16,7 +16,7 @@ execute_process(
     -S "@CMAKE_CURRENT_SOURCE_DIR@/consumer"
     -B "${consumer_build_dir}"
     -DCMAKE_PREFIX_PATH=${stage_dir}
-    -DCMAKE_CUDA_ARCHITECTURES=80
+    "-DCMAKE_CUDA_ARCHITECTURES=@CMAKE_CUDA_ARCHITECTURES@"
   RESULT_VARIABLE configure_result
 )
 if(NOT configure_result EQUAL 0)
@@ -30,4 +30,3 @@ execute_process(
 if(NOT build_result EQUAL 0)
   message(FATAL_ERROR "consumer build failed")
 endif()
-

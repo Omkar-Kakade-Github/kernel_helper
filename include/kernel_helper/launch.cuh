@@ -10,6 +10,8 @@
 
 namespace kernel_helper {
 
+inline constexpr unsigned default_threads_per_block = 256;
+
 struct launch_config_1d {
   dim3 grid{0, 1, 1};
   dim3 block{0, 1, 1};
@@ -18,8 +20,8 @@ struct launch_config_1d {
   constexpr explicit operator bool() const noexcept { return !empty(); }
 };
 
-inline launch_config_1d make_launch_config_1d(std::uint64_t element_count,
-                                              unsigned threads_per_block = 256) {
+inline launch_config_1d make_launch_config_1d(
+    std::uint64_t element_count, unsigned threads_per_block = default_threads_per_block) {
   if (element_count == 0) {
     return {};
   }

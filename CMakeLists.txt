@@ -37,10 +37,6 @@ option(KERNEL_HELPER_BUILD_EXAMPLES "Build kernel_helper examples" ${PROJECT_IS_
 if(KERNEL_HELPER_BUILD_EXAMPLES)
   add_executable(kernel_helper_grid_stride_example examples/grid_stride.cu)
   target_link_libraries(kernel_helper_grid_stride_example PRIVATE kernel_helper::kernel_helper)
-  set_target_properties(
-    kernel_helper_grid_stride_example
-    PROPERTIES CUDA_ARCHITECTURES 80
-  )
 endif()
 
 if(KERNEL_HELPER_BUILD_TESTS)

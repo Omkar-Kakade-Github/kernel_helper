@@ -16,10 +16,6 @@ target_link_libraries(
   kernel_helper_tests
   PRIVATE kernel_helper::kernel_helper GTest::gtest_main
 )
-set_target_properties(
-  kernel_helper_tests
-  PROPERTIES CUDA_ARCHITECTURES 80
-)
 
 include(GoogleTest)
 gtest_discover_tests(kernel_helper_tests DISCOVERY_TIMEOUT 60)
@@ -35,4 +31,3 @@ add_test(
     "${CMAKE_COMMAND}"
     -P "${CMAKE_CURRENT_BINARY_DIR}/install_consumer.cmake"
 )
-

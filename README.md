@@ -49,6 +49,10 @@ target_link_libraries(my_kernel PRIVATE kernel_helper::kernel_helper)
 set_target_properties(my_kernel PROPERTIES CUDA_ARCHITECTURES 80)
 ```
 
+Replace `80` with the architecture needed by the deployment GPU, such as
+`120` for an RTX 50-series GPU. Project examples, tests, and the installation
+consumer test honor `CMAKE_CUDA_ARCHITECTURES`; they do not override it.
+
 Include either the umbrella header or a focused header:
 
 ```cpp
@@ -89,7 +93,7 @@ __global__ void scale(float* values, std::uint64_t count, float factor) {
       });
 }
 
-const auto config = kernel_helper::make_launch_config_1d(count, 256);
+const auto config = kernel_helper::make_launch_config_1d(count);
 if (config) {
   scale<<<config.grid, config.block>>>(values, count, 2.0f);
   KERNEL_HELPER_CUDA_CHECK_LAUNCH();
