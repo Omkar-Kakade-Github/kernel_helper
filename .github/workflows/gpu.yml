@@ -1,0 +1,29 @@
+name: GPU Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  ampere:
+    runs-on: [self-hosted, linux, x64, gpu, ampere]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_CUDA_ARCHITECTURES=80
+          -DKERNEL_HELPER_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Compute Sanitizer
+        run: compute-sanitizer --tool memcheck ./build/tests/kernel_helper_tests
+

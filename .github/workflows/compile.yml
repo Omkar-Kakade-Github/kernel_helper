@@ -1,0 +1,37 @@
+name: Compile
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  cuda:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda:
+          - "12.9.1"
+          - "13.3.0"
+    container:
+      image: nvidia/cuda:${{ matrix.cuda }}-devel-ubuntu24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends cmake ninja-build git ca-certificates
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_CUDA_ARCHITECTURES=80
+          -DKERNEL_HELPER_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test without GPU
+        run: ctest --test-dir build --output-on-failure
+
