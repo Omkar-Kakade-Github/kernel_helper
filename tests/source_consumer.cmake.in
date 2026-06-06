@@ -1,0 +1,27 @@
+if(NOT DEFINED integration)
+  message(FATAL_ERROR "integration mode was not provided")
+endif()
+
+set(consumer_build_dir "@CMAKE_CURRENT_BINARY_DIR@/${integration}-consumer-build")
+
+execute_process(
+  COMMAND
+    "@CMAKE_COMMAND@"
+    -S "@CMAKE_CURRENT_SOURCE_DIR@/${integration}"
+    -B "${consumer_build_dir}"
+    -DKERNEL_HELPER_SOURCE_DIR=@CMAKE_SOURCE_DIR@
+    "-DCMAKE_CUDA_ARCHITECTURES=@CMAKE_CUDA_ARCHITECTURES@"
+  RESULT_VARIABLE configure_result
+)
+if(NOT configure_result EQUAL 0)
+  message(FATAL_ERROR "${integration} consumer configuration failed")
+endif()
+
+execute_process(
+  COMMAND "@CMAKE_COMMAND@" --build "${consumer_build_dir}"
+  RESULT_VARIABLE build_result
+)
+if(NOT build_result EQUAL 0)
+  message(FATAL_ERROR "${integration} consumer build failed")
+endif()
+

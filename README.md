@@ -27,9 +27,53 @@ v0.1 scope.
 CUDA 13 no longer targets several older GPU generations. The stable project
 contract is therefore Ampere or newer even when building with CUDA 12.
 
-## Use From CMake
+## Use From Another Project
 
-Install the project:
+Every integration method exposes the same target:
+
+```cmake
+target_link_libraries(my_kernel PRIVATE kernel_helper::kernel_helper)
+```
+
+Linking the target supplies the include path, CUDA runtime dependency,
+C++17/CUDA C++17 requirements, and NVCC extended-lambda option. The consuming
+project remains responsible for selecting its CUDA architectures.
+
+### FetchContent
+
+For a repository dependency:
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  kernel_helper
+  GIT_REPOSITORY <kernel-helper-repository-url>
+  GIT_TAG v0.1.0
+)
+FetchContent_MakeAvailable(kernel_helper)
+
+add_executable(my_kernel main.cu)
+target_link_libraries(my_kernel PRIVATE kernel_helper::kernel_helper)
+```
+
+Tests, examples, and installation rules stay disabled automatically when
+`kernel_helper` is included as a dependency.
+
+### Vendored Source
+
+Place the repository under the consumer, for example at
+`third_party/kernel_helper`, then use:
+
+```cmake
+add_subdirectory(third_party/kernel_helper)
+
+add_executable(my_kernel main.cu)
+target_link_libraries(my_kernel PRIVATE kernel_helper::kernel_helper)
+```
+
+### Installed Package
+
+Install `kernel_helper` once:
 
 ```bash
 cmake -S . -B build \
@@ -39,7 +83,7 @@ cmake --build build
 cmake --install build --prefix /path/to/prefix
 ```
 
-Consume the installed package:
+Then consume it:
 
 ```cmake
 find_package(kernel_helper 0.1 REQUIRED)
@@ -50,8 +94,12 @@ set_target_properties(my_kernel PROPERTIES CUDA_ARCHITECTURES 80)
 ```
 
 Replace `80` with the architecture needed by the deployment GPU, such as
-`120` for an RTX 50-series GPU. Project examples, tests, and the installation
-consumer test honor `CMAKE_CUDA_ARCHITECTURES`; they do not override it.
+`120` for an RTX 50-series GPU. For local-only builds, CMake 3.24+ can detect
+the current GPU with `-DCMAKE_CUDA_ARCHITECTURES=native`. For reproducible
+release builds, specify the supported architectures explicitly.
+
+Project examples, tests, and integration tests honor
+`CMAKE_CUDA_ARCHITECTURES`; they do not override it.
 
 Include either the umbrella header or a focused header:
 

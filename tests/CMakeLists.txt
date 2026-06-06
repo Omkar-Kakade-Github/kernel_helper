@@ -20,14 +20,31 @@ target_link_libraries(
 include(GoogleTest)
 gtest_discover_tests(kernel_helper_tests DISCOVERY_TIMEOUT 60)
 
-configure_file(
-  install_consumer.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/install_consumer.cmake"
-  @ONLY
-)
-add_test(
-  NAME kernel_helper.install_consumer
-  COMMAND
-    "${CMAKE_COMMAND}"
-    -P "${CMAKE_CURRENT_BINARY_DIR}/install_consumer.cmake"
-)
+if(KERNEL_HELPER_INSTALL)
+  configure_file(
+    install_consumer.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/install_consumer.cmake"
+    @ONLY
+  )
+  add_test(
+    NAME kernel_helper.install_consumer
+    COMMAND
+      "${CMAKE_COMMAND}"
+      -P "${CMAKE_CURRENT_BINARY_DIR}/install_consumer.cmake"
+  )
+endif()
+
+foreach(integration IN ITEMS subdirectory fetch_content)
+  configure_file(
+    source_consumer.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${integration}_consumer.cmake"
+    @ONLY
+  )
+  add_test(
+    NAME "kernel_helper.${integration}_consumer"
+    COMMAND
+      "${CMAKE_COMMAND}"
+      -Dintegration=${integration}
+      -P "${CMAKE_CURRENT_BINARY_DIR}/${integration}_consumer.cmake"
+  )
+endforeach()
