@@ -35,13 +35,15 @@ option(KERNEL_HELPER_BUILD_TESTS "Build kernel_helper tests" ${PROJECT_IS_TOP_LE
 option(KERNEL_HELPER_BUILD_EXAMPLES "Build kernel_helper examples" ${PROJECT_IS_TOP_LEVEL})
 option(KERNEL_HELPER_INSTALL "Generate kernel_helper installation rules" ${PROJECT_IS_TOP_LEVEL})
 
+if(KERNEL_HELPER_BUILD_TESTS)
+  enable_testing()
+endif()
+
 if(KERNEL_HELPER_BUILD_EXAMPLES)
-  add_executable(kernel_helper_grid_stride_example examples/grid_stride.cu)
-  target_link_libraries(kernel_helper_grid_stride_example PRIVATE kernel_helper::kernel_helper)
+  add_subdirectory(examples)
 endif()
 
 if(KERNEL_HELPER_BUILD_TESTS)
-  enable_testing()
   add_subdirectory(tests)
 endif()
 

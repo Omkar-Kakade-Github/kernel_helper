@@ -111,8 +111,38 @@ Include either the umbrella header or a focused header:
 
 `kernel_helper` does not force architecture flags, fast math, relocatable
 device code, or warning settings on consumers. Its CMake target enables
-NVCC extended lambdas because `grid_stride_loop` is designed for
-device-callable lambdas.
+NVCC extended lambdas.
+
+## Examples
+
+Build the complete self-validating example suite for the current GPU:
+
+```bash
+cmake -S . -B build-examples -G Ninja \
+  -DCMAKE_CUDA_ARCHITECTURES=native \
+  -DKERNEL_HELPER_BUILD_EXAMPLES=ON \
+  -DKERNEL_HELPER_BUILD_TESTS=ON
+cmake --build build-examples
+ctest --test-dir build-examples --output-on-failure
+```
+
+The executables are:
+
+- `build-examples/examples/kernel_helper_error_math_example`: typed errors,
+  memory guards, and every math helper; no GPU required.
+- `build-examples/examples/kernel_helper_memory_example`: device ownership,
+  raw and checked copies, zero fill, asynchronous streams, and synchronization.
+- `build-examples/examples/kernel_helper_kernel_primitives_example`: launch
+  configuration, indexing, grid-stride loops, warp metadata, and `float3`
+  operations.
+- `build-examples/examples/kernel_helper_atomics_example`: contended and
+  NaN-aware `float` and `double` atomic minimum/maximum.
+- `build-examples/examples/kernel_helper_collectives_example`: generic,
+  sum, minimum, and maximum warp/block reductions with full and partial input.
+
+Each executable validates its expected results and returns nonzero on failure.
+GPU examples return `77` when no device is visible, which CTest records as
+skipped.
 
 ## Error Handling
 
@@ -215,7 +245,8 @@ otherwise CMake downloads the pinned release when tests are enabled.
 ```bash
 cmake -S . -B build -G Ninja \
   -DCMAKE_CUDA_ARCHITECTURES=80 \
-  -DKERNEL_HELPER_BUILD_TESTS=ON
+  -DKERNEL_HELPER_BUILD_TESTS=ON \
+  -DKERNEL_HELPER_BUILD_EXAMPLES=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
