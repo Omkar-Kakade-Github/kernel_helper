@@ -1,8 +1,6 @@
 /build/
 /build-*/
 /.cache/
-/legacy/
 *.o
 *.a
 *.so
-

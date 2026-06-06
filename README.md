@@ -224,12 +224,6 @@ GPU tests skip cleanly when no CUDA device is visible. Release validation also
 runs the GPU suite and Compute Sanitizer on a self-hosted Ampere-or-newer
 runner.
 
-## Legacy Sample
-
-The original experimental header is preserved at
-`legacy/old_sample.cuh`. It is unsupported, is not installed, and should not
-be included by new code.
-
 ## License
 
 MIT
